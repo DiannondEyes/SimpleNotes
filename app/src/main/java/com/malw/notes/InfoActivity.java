@@ -25,6 +25,7 @@ public class InfoActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         data = new StringBuilder();
+        // Получаю имя файла из intent'a, устанавливаю его как название
         title = getIntent().getStringExtra("name");
         setContentView(R.layout.activity_info);
         ((TextView)findViewById(R.id.title)).setText(title);
@@ -32,11 +33,13 @@ public class InfoActivity extends AppCompatActivity {
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == Activity.RESULT_OK) {
+                        // После будущего запуска EditActivity, нужно обновить поля, значения которых будут переданы в результат.
                         ((TextView)findViewById(R.id.title)).setText(result.getData().getStringExtra("title"));
                         ((TextView)findViewById(R.id.descripton)).setText(result.getData().getStringExtra("content"));
                     };
                 }
         );
+        // Считываю содержимое файла, устанавливаю его как текст заметки.
         try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(getFilesDir(), "notes/"+title+".txt"))))) {
             String line;
             while ((line = bufferedReader.readLine()) != null) {
@@ -49,6 +52,7 @@ public class InfoActivity extends AppCompatActivity {
 
     }
 
+    // При нажатии на кнопку редактирования, вызываю EditActivity и передаю туда название и текст заметки
     public void edit(View view) {
         activityLauncher.launch(new Intent(InfoActivity.this, EditActivity.class).putExtra("content", data.toString()).putExtra("title", title));
     }
